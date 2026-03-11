@@ -141,7 +141,7 @@ export default function AdminAIAgent() {
   const hasPhone = phoneNumbers.length > 0;
 
   return (
-    <div className="space-y-6 p-1 sm:p-2 md:p-0 overflow-x-hidden max-w-full">
+    <div className="space-y-6 p-1 sm:p-2 md:p-0 overflow-hidden max-w-full min-w-0 w-full">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
@@ -236,7 +236,7 @@ export default function AdminAIAgent() {
       )}
 
       {!loading && (
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 min-w-0">
           {/* Agent Info / Capabilities Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -369,7 +369,7 @@ export default function AdminAIAgent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden w-full min-w-0"
+          className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden w-full min-w-0 max-w-full"
         >
           <div className="flex items-center justify-between px-3 sm:px-6 py-5 border-b border-zinc-800">
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
@@ -403,29 +403,29 @@ export default function AdminAIAgent() {
                   : null;
 
                 return (
-                  <div key={call.id || i} className="px-3 sm:px-6 py-4 flex items-center gap-3 sm:gap-4 hover:bg-zinc-900/50 transition-colors overflow-hidden">
-                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  <div key={call.id || i} className="px-3 sm:px-6 py-4 flex items-center gap-2 sm:gap-4 hover:bg-zinc-900/50 transition-colors overflow-hidden min-w-0">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       isFailed ? 'bg-red-400/10' : isEnded ? 'bg-green-400/10' : 'bg-zinc-800'
                     }`}>
                       {isFailed ? <FaTimesCircle className="text-red-400 text-xs" /> :
                        isEnded ? <FaCheckCircle className="text-green-400 text-xs" /> :
                        <FaPhone className="text-zinc-400 text-xs" />}
                     </div>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <p className="text-white text-sm font-medium flex items-center gap-2 truncate">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-xs sm:text-sm font-medium flex items-center gap-2 truncate">
                         <FaUser className="text-zinc-500 text-[10px] flex-shrink-0" />
                         <span className="truncate">{call.customer?.number || call.type || 'Unknown'}</span>
                       </p>
-                      <p className="text-zinc-500 text-xs mt-0.5 truncate">
+                      <p className="text-zinc-500 text-[10px] sm:text-xs mt-0.5 truncate max-w-full">
                         {call.analysis?.summary || call.endedReason || 'No summary available'}
                       </p>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-zinc-500 text-xs flex items-center gap-1 justify-end">
+                    <div className="text-right flex-shrink-0 ml-auto">
+                      <p className="text-zinc-500 text-[10px] sm:text-xs flex items-center gap-1 justify-end whitespace-nowrap">
                         <FaClock className="text-[9px]" />
                         {duration ? `${Math.floor(duration / 60)}m ${duration % 60}s` : '—'}
                       </p>
-                      <p className="text-zinc-600 text-[10px] mt-0.5">
+                      <p className="text-zinc-600 text-[10px] mt-0.5 whitespace-nowrap">
                         {call.createdAt ? new Date(call.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ''}
                       </p>
                     </div>
