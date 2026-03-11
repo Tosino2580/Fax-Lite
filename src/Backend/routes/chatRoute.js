@@ -4,13 +4,35 @@ import Product from '../models/Product.js';
 
 const chatRouter = express.Router();
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://fax-lite-5cfa.vercel.app';
+
 const SYSTEM_PROMPT = `You are a friendly, professional customer service assistant for FAX Collections — a premium African fashion e-commerce brand based in Lagos, Nigeria.
 
 ABOUT FAX COLLECTIONS:
-- We sell premium African menswear: Agbadas, Kaftans, Jalabiya, and modern collections
+- We sell premium African menswear: Agbadas, Kaftans, Jalabiya, Abaya, CropTop, Kids wear, and modern collections
 - Based in Lagos, Nigeria with worldwide shipping
-- Website: faxcollections.com
+- Website: ${FRONTEND_URL}
 - Business hours: Monday-Friday 9AM-6PM, Saturday 10AM-4PM, Sunday closed
+
+WEBSITE PAGES (share these links when helpful):
+- Homepage: ${FRONTEND_URL}/
+- All Collections: ${FRONTEND_URL}/collections
+- Agbada Collection: ${FRONTEND_URL}/collections?category=Agbada
+- Kaftan Collection: ${FRONTEND_URL}/collections?category=Kaftan
+- Jalabiya Collection: ${FRONTEND_URL}/collections?category=Jalabiya
+- Abaya Collection: ${FRONTEND_URL}/collections?category=Abaya
+- Kids Collection: ${FRONTEND_URL}/collections?category=Kids
+- Contact Page: ${FRONTEND_URL}/contact
+- Track Order: ${FRONTEND_URL}/track-order
+- My Account / Orders: ${FRONTEND_URL}/account/orders
+- Cart: ${FRONTEND_URL}/cart
+- Checkout: ${FRONTEND_URL}/checkout
+
+HOW TO HELP CUSTOMERS SHOP:
+- When a customer wants to buy/order something, share the direct link to the relevant collection or product
+- To order: browse products → add to cart → go to checkout → fill shipping address → choose payment method (Card, Bank Transfer, or Cash on Delivery) → place order
+- After placing an order, they'll get an order confirmation with a tracking ID
+- They can track orders on the Track Order page or in My Account > Orders
 
 POLICIES:
 - RETURNS & EXCHANGES: 7-day return window from delivery, items must be unworn with original tags, custom orders non-refundable, free exchanges for wrong sizes, refunds in 3-5 business days
@@ -21,9 +43,11 @@ POLICIES:
 STYLE:
 - Be warm, concise, and helpful
 - Use simple, clear language
+- When sharing product info, include the name, price, available sizes, and a link to view it
+- When sharing product images, format them as: [View Image](image_url)
 - If you can't resolve something, suggest emailing support@faxcollections.com or using the contact form
 - Only share product/order info from the CONTEXT DATA provided below — don't make up products or prices
-- Keep responses short (2-4 sentences max unless detailed info is needed)`;
+- Keep responses short (2-4 sentences max unless listing products)`;
 
 // Pre-fetch relevant data based on the user's message
 async function getContextData(msg) {
@@ -32,7 +56,7 @@ async function getContextData(msg) {
 
   // Check for order tracking
   const idMatch = lower.match(/[a-f0-9]{8,24}/i);
-  if (idMatch || lower.includes('track') || lower.includes('order') || lower.includes('status')) {
+  if (idMatch || lower.includes('track') || lower.includes('order') || lower.includes('status') || lower.includes('where is my')) {
     if (idMatch) {
       const id = idMatch[0].trim().replace(/^#/, '');
       let order = null;
@@ -46,43 +70,87 @@ async function getContextData(msg) {
       }
 
       if (order) {
-        const itemNames = order.items.map((i) => i.name).join(', ');
+        const itemNames = order.items.map((i) => `${i.name} (x${i.quantity || 1})`).join(', ');
         context += `\n\nORDER DATA: Order ID: ...${order._id.toString().slice(-8).toUpperCase()}. Status: ${order.status}. Items: ${itemNames}. Total: ₦${order.totalAmount?.toLocaleString()}. Placed: ${new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}.`;
       } else {
-        context += `\n\nORDER DATA: No order found with ID "${id}". Suggest the customer double-check their order ID from their confirmation email or My Orders page.`;
+        context += `\n\nORDER DATA: No order found with ID "${id}". Suggest the customer double-check their order ID from their confirmation email or My Orders page at ${FRONTEND_URL}/account/orders.`;
       }
     }
   }
 
-  // Check for product queries
-  const productKeywords = ['product', 'buy', 'purchase', 'shop', 'dress', 'wear', 'cloth', 'agbada', 'kaftan', 'jalabiya', 'collection', 'catalog', 'price', 'cost', 'how much', 'available', 'stock', 'sell', 'have'];
+  // Always fetch catalog summary for product-related and general queries
+  const productKeywords = ['product', 'buy', 'purchase', 'shop', 'dress', 'wear', 'cloth', 'agbada', 'kaftan', 'jalabiya', 'abaya', 'crop', 'kid', 'collection', 'catalog', 'price', 'cost', 'how much', 'available', 'stock', 'sell', 'have', 'show', 'see', 'browse', 'what do you', 'what you', 'image', 'picture', 'photo', 'look', 'new', 'latest', 'popular', 'best', 'recommend', 'suggest', 'cheap', 'affordable', 'expensive', 'item', 'help me', 'i want', 'i need', 'checkout', 'cart', 'add to'];
   const wantsProducts = productKeywords.some((k) => lower.includes(k));
 
   if (wantsProducts) {
-    // Extract search terms or fetch popular products
-    const searchTerms = ['agbada', 'kaftan', 'jalabiya', 'shirt', 'cap', 'pant', 'dress', 'suit', 'trouser'];
-    const found = searchTerms.find((t) => lower.includes(t));
-    const query = found || '';
+    // Extract search terms
+    const categoryMap = {
+      agbada: 'Agbada',
+      kaftan: 'Kaftan',
+      jalabiya: 'Jalabiya',
+      abaya: 'Abaya',
+      'crop top': 'CropTop',
+      croptop: 'CropTop',
+      kid: 'Kids',
+      kids: 'Kids',
+      children: 'Kids',
+    };
 
     let products;
-    if (query) {
-      products = await Product.find({
-        $or: [
-          { name: { $regex: query, $options: 'i' } },
-          { category: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } },
-        ],
-      }).limit(5);
+    const matchedCategory = Object.keys(categoryMap).find((k) => lower.includes(k));
+
+    if (matchedCategory) {
+      products = await Product.find({ category: categoryMap[matchedCategory], isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(8);
     } else {
-      // Show some featured products
-      products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+      // General search or latest products
+      const searchTerms = lower.match(/\b(shirt|cap|pant|suit|trouser|gown|top|dress|white|black|blue|red|green|gold)\b/gi);
+      if (searchTerms) {
+        const regex = searchTerms.join('|');
+        products = await Product.find({
+          isActive: true,
+          $or: [
+            { name: { $regex: regex, $options: 'i' } },
+            { description: { $regex: regex, $options: 'i' } },
+          ],
+        }).limit(8);
+      }
+      if (!products || products.length === 0) {
+        products = await Product.find({ isActive: true }).sort({ createdAt: -1 }).limit(8);
+      }
     }
 
     if (products.length > 0) {
-      const list = products.map((p) => `• ${p.name} — ₦${p.price?.toLocaleString()}${p.category ? ` (${p.category})` : ''}`).join('\n');
-      context += `\n\nPRODUCT DATA:\n${list}`;
+      const list = products
+        .map((p) => {
+          const img = p.images?.[0] ? ` | Image: ${p.images[0]}` : '';
+          const sizes = p.sizes?.length ? ` | Sizes: ${p.sizes.join(', ')}` : '';
+          const stock = p.inStock > 0 ? `In Stock (${p.inStock})` : 'Out of Stock';
+          const oldPrice = p.oldPrice ? ` (was ₦${p.oldPrice.toLocaleString()})` : '';
+          const badge = p.badge ? ` [${p.badge}]` : '';
+          const link = ` | View: ${FRONTEND_URL}/product/${p._id}`;
+          return `• ${p.name}${badge} — ₦${p.price?.toLocaleString()}${oldPrice} | ${p.category} | ${stock}${sizes}${img}${link}`;
+        })
+        .join('\n');
+      context += `\n\nPRODUCT DATA (${products.length} items):\n${list}`;
     } else {
-      context += `\n\nPRODUCT DATA: No specific products found. Suggest browsing the full collection at faxcollections.com.`;
+      context += `\n\nPRODUCT DATA: No matching products found. Suggest browsing all collections at ${FRONTEND_URL}/collections.`;
+    }
+
+    // Also add category counts
+    try {
+      const categoryCounts = await Product.aggregate([
+        { $match: { isActive: true } },
+        { $group: { _id: '$category', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]);
+      if (categoryCounts.length > 0) {
+        const summary = categoryCounts.map((c) => `${c._id}: ${c.count} items`).join(', ');
+        context += `\n\nCATALOG SUMMARY: ${summary}. Total active products: ${categoryCounts.reduce((sum, c) => sum + c.count, 0)}.`;
+      }
+    } catch {
+      // Ignore aggregation error
     }
   }
 

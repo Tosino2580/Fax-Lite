@@ -5,12 +5,61 @@ import { FaComments, FaTimes, FaPaperPlane, FaRobot, FaUser } from 'react-icons/
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const QUICK_ACTIONS = [
+  { label: 'Show me products', message: 'What products do you have? Show me your latest items with prices' },
+  { label: 'Help me order', message: 'How do I place an order on your website?' },
   { label: 'Track my order', message: 'I want to track my order' },
-  { label: 'Product availability', message: 'What products do you have available?' },
   { label: 'Return policy', message: 'What is your return policy?' },
-  { label: 'Delivery info', message: 'What are your delivery timelines?' },
+  { label: 'Delivery info', message: 'What are your delivery timelines and shipping costs?' },
   { label: 'Contact support', message: 'How can I contact customer support?' },
 ];
+
+// Render message content with clickable links and images
+function renderMessageContent(text) {
+  if (!text) return text;
+
+  // Split by markdown links: [text](url) and plain URLs
+  const parts = [];
+  let remaining = text;
+  let key = 0;
+
+  // Match markdown links [text](url)
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    // Add text before the link
+    if (match.index > lastIndex) {
+      parts.push(<span key={key++}>{text.slice(lastIndex, match.index)}</span>);
+    }
+
+    const linkText = match[1];
+    const url = match[2];
+
+    // Check if it's an image URL
+    if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)/i) || url.includes('cloudinary') || url.includes('res.cloudinary')) {
+      parts.push(
+        <a key={key++} href={url} target="_blank" rel="noopener noreferrer" className="block my-1.5">
+          <img src={url} alt={linkText} className="max-w-full w-40 h-40 object-cover rounded-lg border border-zinc-700" />
+        </a>
+      );
+    } else {
+      parts.push(
+        <a key={key++} href={url} target="_blank" rel="noopener noreferrer" className="text-yellow-400 underline underline-offset-2 hover:text-yellow-300">
+          {linkText}
+        </a>
+      );
+    }
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(<span key={key++}>{text.slice(lastIndex)}</span>);
+  }
+
+  return parts.length > 0 ? parts : text;
+}
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -162,13 +211,13 @@ export default function ChatBot() {
 
                   {/* Bubble */}
                   <div
-                    className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                    className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
                       msg.role === 'user'
                         ? 'bg-yellow-400 text-black rounded-br-md'
                         : 'bg-zinc-800/80 text-zinc-200 rounded-bl-md'
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === 'assistant' ? renderMessageContent(msg.content) : msg.content}
                   </div>
                 </div>
               ))}
