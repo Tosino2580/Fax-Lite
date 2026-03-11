@@ -25,6 +25,8 @@ const NavBar = () => {
     const [subMenuOpen, setSubMenuOpen] = useState(null);
     const [scrolled, setScrolled] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [mobileLangOpen, setMobileLangOpen] = useState(false);
+    const [mobileCurrOpen, setMobileCurrOpen] = useState(false);
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const { currencyCode, changeCurrency, currencies } = useCurrency();
@@ -276,30 +278,69 @@ const NavBar = () => {
                         </div>
 
                         {/* Mobile Language & Currency Switcher */}
-                        <div className='flex gap-6 mt-8 pt-6 border-t border-white/10'>
-                            <div className='flex flex-col gap-2 flex-1'>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Language</p>
-                                {languages.map(lang => (
-                                    <button
-                                        key={lang.code}
-                                        onClick={() => i18n.changeLanguage(lang.code)}
-                                        className={`text-sm transition-colors cursor-pointer text-left ${lang.code === i18n.language ? 'text-yellow-400 font-medium' : 'text-gray-400 hover:text-yellow-400'}`}
-                                    >
-                                        {lang.name}
-                                    </button>
-                                ))}
+                        <div className='flex gap-3 mt-8 pt-6 border-t border-white/10'>
+                            {/* Language Dropdown */}
+                            <div className="relative flex-1">
+                                <button
+                                    onClick={() => { setMobileLangOpen(!mobileLangOpen); setMobileCurrOpen(false); }}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-white cursor-pointer hover:border-zinc-500 transition-colors"
+                                >
+                                    <span>{currentLang.name}</span>
+                                    <FaChevronDown className={`text-xs text-gray-400 transition-transform duration-200 ${mobileLangOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                    {mobileLangOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute bottom-full left-0 right-0 mb-1 bg-zinc-900 border border-zinc-700 rounded-lg overflow-hidden shadow-xl z-10"
+                                        >
+                                            {languages.map(lang => (
+                                                <button
+                                                    key={lang.code}
+                                                    onClick={() => { i18n.changeLanguage(lang.code); setMobileLangOpen(false); }}
+                                                    className={`block w-full text-left px-3 py-2.5 text-sm cursor-pointer transition-colors ${lang.code === i18n.language ? 'text-yellow-400 bg-yellow-400/10' : 'text-gray-300 hover:bg-white/5'}`}
+                                                >
+                                                    {lang.name}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
-                            <div className='flex flex-col gap-2 flex-1'>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Currency</p>
-                                {Object.keys(currencies).map(code => (
-                                    <button
-                                        key={code}
-                                        onClick={() => changeCurrency(code)}
-                                        className={`text-sm transition-colors cursor-pointer text-left ${code === currencyCode ? 'text-yellow-400 font-medium' : 'text-gray-400 hover:text-yellow-400'}`}
-                                    >
-                                        {currencies[code].symbol} {code}
-                                    </button>
-                                ))}
+
+                            {/* Currency Dropdown */}
+                            <div className="relative flex-1">
+                                <button
+                                    onClick={() => { setMobileCurrOpen(!mobileCurrOpen); setMobileLangOpen(false); }}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-white cursor-pointer hover:border-zinc-500 transition-colors"
+                                >
+                                    <span>{currencies[currencyCode]?.symbol} {currencyCode}</span>
+                                    <FaChevronDown className={`text-xs text-gray-400 transition-transform duration-200 ${mobileCurrOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                    {mobileCurrOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute bottom-full left-0 right-0 mb-1 bg-zinc-900 border border-zinc-700 rounded-lg overflow-hidden shadow-xl z-10"
+                                        >
+                                            {Object.keys(currencies).map(code => (
+                                                <button
+                                                    key={code}
+                                                    onClick={() => { changeCurrency(code); setMobileCurrOpen(false); }}
+                                                    className={`block w-full text-left px-3 py-2.5 text-sm cursor-pointer transition-colors ${code === currencyCode ? 'text-yellow-400 bg-yellow-400/10' : 'text-gray-300 hover:bg-white/5'}`}
+                                                >
+                                                    {currencies[code].symbol} {code}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
                     </motion.div>
