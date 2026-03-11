@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { FaRobot, FaPhone, FaPhoneAlt, FaPlay, FaCheckCircle, FaTimesCircle, FaSpinner, FaHistory, FaClock, FaUser, FaPlus } from 'react-icons/fa';
+import { FaRobot, FaPhone, FaPhoneAlt, FaPlay, FaCheckCircle, FaTimesCircle, FaSpinner, FaHistory, FaClock, FaUser, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAdmin } from '../../context/AdminContext';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -17,6 +17,10 @@ export default function AdminAIAgent() {
   const [calls, setCalls] = useState([]);
   const [callsLoading, setCallsLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [twilioSid, setTwilioSid] = useState('');
+  const [twilioToken, setTwilioToken] = useState('');
+  const [twilioNumber, setTwilioNumber] = useState('');
+  const [showToken, setShowToken] = useState(false);
 
   const headers = { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' };
 
@@ -83,25 +87,36 @@ export default function AdminAIAgent() {
     }
   };
 
-  // Purchase phone number
+  // Import Twilio phone number
   const handlePurchaseNumber = async () => {
+    if (!twilioSid || !twilioToken || !twilioNumber) {
+      setMessage({ type: 'error', text: 'Please fill in all three Twilio fields.' });
+      return;
+    }
     setPhoneLoading(true);
     setMessage(null);
     try {
       const res = await fetch(`${API_BASE}/api/vapi/purchase-number`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          twilioAccountSid: twilioSid.trim(),
+          twilioAuthToken: twilioToken.trim(),
+          twilioPhoneNumber: twilioNumber.trim(),
+        }),
       });
       const data = await res.json();
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
+        setTwilioSid('');
+        setTwilioToken('');
+        setTwilioNumber('');
         fetchStatus();
       } else {
         setMessage({ type: 'error', text: data.message });
       }
     } catch {
-      setMessage({ type: 'error', text: 'Failed to purchase phone number.' });
+      setMessage({ type: 'error', text: 'Failed to import Twilio number.' });
     } finally {
       setPhoneLoading(false);
     }
@@ -204,16 +219,6 @@ export default function AdminAIAgent() {
                   {setupLoading ? 'Setting up...' : 'Activate Agent'}
                 </button>
               )}
-              {hasAssistant && !hasPhone && (
-                <button
-                  onClick={handlePurchaseNumber}
-                  disabled={phoneLoading}
-                  className="bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer w-full sm:w-auto"
-                >
-                  {phoneLoading ? <FaSpinner className="animate-spin text-xs" /> : <FaPlus className="text-xs" />}
-                  {phoneLoading ? 'Getting number...' : 'Get Phone Number'}
-                </button>
-              )}
             </div>
           </div>
         </motion.div>
@@ -292,14 +297,63 @@ export default function AdminAIAgent() {
               </div>
             )}
 
-            {/* No phone number guidance */}
+            {/* Twilio setup form */}
             {hasAssistant && !hasPhone && (
               <div className="mt-5 pt-5 border-t border-zinc-800">
                 <div className="bg-blue-400/5 border border-blue-400/20 rounded-xl p-4">
-                  <p className="text-blue-400 text-sm font-medium mb-1">Phone Number Required</p>
-                  <p className="text-zinc-400 text-xs leading-relaxed">
-                    Click "Get Phone Number" above to get a free US number from Vapi. Alternatively, you can import your own Twilio number from the Vapi dashboard at dashboard.vapi.ai.
+                  <p className="text-blue-400 text-sm font-medium mb-1">Connect Your Twilio Number</p>
+                  <p className="text-zinc-400 text-xs leading-relaxed mb-4">
+                    Import your own Twilio phone number so customers can call your AI agent directly. Get a free Twilio account and number at twilio.com.
                   </p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-zinc-400 text-xs mb-1 block">Account SID</label>
+                      <input
+                        type="text"
+                        value={twilioSid}
+                        onChange={(e) => setTwilioSid(e.target.value)}
+                        placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        className="w-full bg-zinc-800/60 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-400/50 transition-colors font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-zinc-400 text-xs mb-1 block">Auth Token</label>
+                      <div className="relative">
+                        <input
+                          type={showToken ? 'text' : 'password'}
+                          value={twilioToken}
+                          onChange={(e) => setTwilioToken(e.target.value)}
+                          placeholder="Your Twilio Auth Token"
+                          className="w-full bg-zinc-800/60 border border-zinc-700 rounded-lg px-3 py-2.5 pr-10 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-400/50 transition-colors font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowToken(!showToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                        >
+                          {showToken ? <FaEyeSlash className="text-xs" /> : <FaEye className="text-xs" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-zinc-400 text-xs mb-1 block">Phone Number</label>
+                      <input
+                        type="tel"
+                        value={twilioNumber}
+                        onChange={(e) => setTwilioNumber(e.target.value)}
+                        placeholder="+1234567890"
+                        className="w-full bg-zinc-800/60 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-400/50 transition-colors font-mono"
+                      />
+                    </div>
+                    <button
+                      onClick={handlePurchaseNumber}
+                      disabled={phoneLoading}
+                      className="w-full bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+                    >
+                      {phoneLoading ? <FaSpinner className="animate-spin text-xs" /> : <FaPlus className="text-xs" />}
+                      {phoneLoading ? 'Importing...' : 'Import Twilio Number'}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

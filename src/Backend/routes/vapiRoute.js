@@ -127,11 +127,20 @@ vapiRouter.get('/agent-status', adminAuth, async (req, res) => {
   }
 });
 
-// ─── Admin: Purchase a phone number ─────────────────────────────────────────
+// ─── Admin: Import a Twilio phone number ────────────────────────────────────
 vapiRouter.post('/purchase-number', adminAuth, async (req, res) => {
   try {
     if (!process.env.VAPI_API_KEY) {
       return res.status(400).json({ success: false, message: 'VAPI_API_KEY not configured' });
+    }
+
+    const { twilioAccountSid, twilioAuthToken, twilioPhoneNumber } = req.body;
+
+    if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Twilio Account SID, Auth Token, and Phone Number are all required.',
+      });
     }
 
     // Get the first assistant to link
@@ -142,26 +151,46 @@ vapiRouter.post('/purchase-number', adminAuth, async (req, res) => {
     }
 
     const assistantId = assistants[0].id;
-    const { areaCode } = req.body;
 
+    // 1. Create Twilio credential in Vapi
+    let credentialId;
+    try {
+      const credRes = await vapiAPI.post('/credential', {
+        provider: 'twilio',
+        authToken: twilioAuthToken,
+        accountSid: twilioAccountSid,
+      });
+      credentialId = credRes.data?.id;
+    } catch (credErr) {
+      // If credential already exists, try to continue
+      const errMsg = credErr.response?.data?.message || credErr.message || '';
+      if (!errMsg.toLowerCase().includes('already') && !errMsg.toLowerCase().includes('duplicate')) {
+        console.error('Vapi credential error:', credErr.response?.data || credErr.message);
+        return res.status(400).json({
+          success: false,
+          message: `Failed to add Twilio credentials to Vapi: ${errMsg}`,
+        });
+      }
+    }
+
+    // 2. Import the Twilio phone number into Vapi, linked to the assistant
     const phoneRes = await vapiAPI.post('/phone-number', {
-      provider: 'vapi',
+      provider: 'twilio',
+      number: twilioPhoneNumber,
+      twilioAccountSid,
+      twilioAuthToken,
       assistantId,
-      ...(areaCode ? { numberDesiredAreaCode: areaCode } : {}),
     });
 
     res.json({
       success: true,
-      message: `Phone number purchased: ${phoneRes.data.number}`,
+      message: `Twilio number imported: ${phoneRes.data.number}`,
       phoneNumber: { id: phoneRes.data.id, number: phoneRes.data.number },
     });
   } catch (error) {
-    console.error('Vapi purchase number error:', error.response?.data || error.message);
-    const msg = error.response?.data?.message || error.message || 'Failed to purchase phone number';
-    res.status(500).json({
-      success: false,
-      message: msg.includes('limit') ? 'Free number limit reached. Import a Twilio number from the Vapi dashboard instead.' : msg,
-    });
+    console.error('Vapi import number error:', error.response?.data || error.message);
+    const msg = error.response?.data?.message || error.message || 'Failed to import Twilio number';
+    res.status(500).json({ success: false, message: msg });
   }
 });
 
