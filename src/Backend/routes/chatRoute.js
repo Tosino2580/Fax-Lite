@@ -100,7 +100,7 @@ async function getContextData(msg) {
     const matchedCategory = Object.keys(categoryMap).find((k) => lower.includes(k));
 
     if (matchedCategory) {
-      products = await Product.find({ category: categoryMap[matchedCategory], isActive: true })
+      products = await Product.find({ category: categoryMap[matchedCategory], isActive: { $ne: false } })
         .sort({ createdAt: -1 })
         .limit(8);
     } else {
@@ -109,7 +109,7 @@ async function getContextData(msg) {
       if (searchTerms) {
         const regex = searchTerms.join('|');
         products = await Product.find({
-          isActive: true,
+          isActive: { $ne: false },
           $or: [
             { name: { $regex: regex, $options: 'i' } },
             { description: { $regex: regex, $options: 'i' } },
@@ -117,7 +117,7 @@ async function getContextData(msg) {
         }).limit(8);
       }
       if (!products || products.length === 0) {
-        products = await Product.find({ isActive: true }).sort({ createdAt: -1 }).limit(8);
+        products = await Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 }).limit(8);
       }
     }
 
@@ -141,7 +141,7 @@ async function getContextData(msg) {
     // Also add category counts
     try {
       const categoryCounts = await Product.aggregate([
-        { $match: { isActive: true } },
+        { $match: { isActive: { $ne: false } } },
         { $group: { _id: '$category', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]);
@@ -263,6 +263,7 @@ chatRouter.post('/', async (req, res) => {
     try {
       // Pre-fetch relevant data and inject into system prompt
       const contextData = await getContextData(lastMsg);
+      console.log('Chat context data length:', contextData.length, contextData ? 'has data' : 'empty');
       const fullSystemPrompt = SYSTEM_PROMPT + contextData;
 
       const aiMessages = [
