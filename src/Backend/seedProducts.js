@@ -8,8 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI);
+// Connect to MongoDB (use same dbName as server config)
+mongoose.connect(process.env.MONGODB_URI, { dbName: 'fax_collections' });
 mongoose.connection.on('connected', () => console.log('MongoDB connected'));
 mongoose.connection.on('error', (err) => console.error('MongoDB error:', err));
 
