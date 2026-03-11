@@ -60,6 +60,7 @@ const NavBar = () => {
     }, [subMenuOpen])
 
     return (
+        <>
         <nav className={`flex items-center justify-between py-3 px-6 md:px-12 fixed top-0 left-0 w-full text-white z-50 transition-all duration-300 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-lg' : 'bg-black shadow-md'}`}>
             <button onClick={() => setMenuOpen(true)} className="md:hidden text-white text-2xl cursor-pointer" aria-label="Open menu">
                 <FaBars />
@@ -183,6 +184,9 @@ const NavBar = () => {
                     )}
                 </div>
             </div>
+
+            <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+        </nav>
 
             {/* Mobile Menu Overlay */}
             <AnimatePresence>
@@ -346,9 +350,7 @@ const NavBar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-        </nav>
+        </>
     )
 }
 
