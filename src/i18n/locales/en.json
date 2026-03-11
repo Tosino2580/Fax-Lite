@@ -1,0 +1,182 @@
+{
+  "nav": {
+    "men": "Men",
+    "women": "Women",
+    "kids": "Kids",
+    "collections": "Collections",
+    "myAccount": "My Account",
+    "orders": "Orders",
+    "wishlist": "Wishlist",
+    "vouchers": "Vouchers",
+    "signOut": "Sign Out",
+    "logIn": "Log in",
+    "register": "Register"
+  },
+  "menu": {
+    "jalabiya": "Jalabiya",
+    "kaftans": "Kaftans & Shirts",
+    "agbada": "Agbada",
+    "casuals": "Casuals",
+    "tshirts": "T-Shirts",
+    "pants": "Pants",
+    "abaya": "Abaya",
+    "cropTop": "Crop Top"
+  },
+  "hero": {
+    "badge": "New Collection",
+    "title": "Discover Premium African Fashion",
+    "subtitle": "Handcrafted pieces that celebrate heritage and contemporary style. Explore our curated collection.",
+    "cta": "Shop Now"
+  },
+  "arrivals": {
+    "subtitle": "Curated For You",
+    "title": "New Arrivals"
+  },
+  "viewAll": "View All Products",
+  "carousel": {
+    "subtitle": "Explore",
+    "title": "Shop by Category"
+  },
+  "story": {
+    "subtitle": "Our Heritage",
+    "title": "Our Story",
+    "heading": "Afro Fashion: FAX Collections' Passionate Quest to Unravel Africa's Soul",
+    "p1": "Our journey begins in the bustling city of Lagos, where the soul of Afro fashion pulses through vibrant patterns and colors. It's a place where artisans with paintbrushes in hand transform garments into canvases that share stories of resilience, pride, and a deep-rooted connection to the continent.",
+    "p2": "Every piece in our collection is a testament to the rich tapestry of African culture — modern, bold, and unapologetically authentic."
+  },
+  "collections": {
+    "subtitle": "Browse Our Catalog",
+    "title": "All Collections",
+    "description": "Explore our full range of handcrafted African fashion pieces, from traditional Agbada to contemporary crop tops."
+  },
+  "kids": {
+    "subtitle": "For The Little Ones",
+    "title": "Kids Collection",
+    "comingSoon": "Coming Soon",
+    "comingSoonDesc": "We're crafting an amazing collection for kids. Stay tuned for vibrant, comfortable African-inspired fashion for the little ones.",
+    "browseOther": "Browse Other Collections"
+  },
+  "product": {
+    "new": "New",
+    "addToCart": "Add to Cart",
+    "size": "Size",
+    "qty": "Qty",
+    "onlyLeft": "Only {{count}} left in stock",
+    "off": "OFF",
+    "notFound": "Product not found",
+    "backHome": "Back to Home",
+    "home": "Home",
+    "addedToWishlist": "Added to wishlist!",
+    "removedFromWishlist": "Removed from wishlist",
+    "product": "product",
+    "products": "products"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "emptyHint": "Add items to get started",
+    "size": "Size",
+    "qty": "Qty",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping"
+  },
+  "search": {
+    "placeholder": "Search for products...",
+    "startTyping": "Start typing to search across all products",
+    "noResults": "No results for",
+    "tryDifferent": "Try a different search term",
+    "result": "result",
+    "results": "results"
+  },
+  "footer": {
+    "newsletter": "Stay in the loop",
+    "newsletterDesc": "Get exclusive deals and new arrivals straight to your inbox.",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "brand": "Premium African fashion for the modern world. Handcrafted pieces that celebrate heritage and contemporary style.",
+    "quickLinks": "Quick Links",
+    "blog": "Blog",
+    "faqs": "FAQs",
+    "trackOrder": "Track Order",
+    "contactUs": "Contact Us",
+    "information": "Information",
+    "terms": "Terms of Service",
+    "returnPolicy": "Return Policy",
+    "deliveryPolicy": "Delivery Policy",
+    "privacyPolicy": "Privacy Policy",
+    "followUs": "Follow Us",
+    "rights": "FAX Collections. All rights reserved."
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "signInDesc": "Sign in to your FAX Collections account",
+    "email": "Email Address",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signingIn": "Signing In...",
+    "noAccount": "Don't have an account?",
+    "createOne": "Create one",
+    "createAccount": "Create Account",
+    "joinDesc": "Join FAX Collections for the best African fashion",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmPassword": "Confirm Password",
+    "minChars": "Min. 6 characters",
+    "reEnter": "Re-enter password",
+    "creatingAccount": "Creating Account...",
+    "alreadyHave": "Already have an account?",
+    "signInLink": "Sign in",
+    "welcomeToast": "Welcome back!",
+    "accountCreated": "Account created successfully!",
+    "passwordsMismatch": "Passwords do not match"
+  },
+  "account": {
+    "title": "My Account",
+    "subtitle": "Manage your profile and preferences",
+    "personalInfo": "Personal info & settings",
+    "trackOrders": "Track & manage orders",
+    "savedItems": "Your saved items",
+    "discounts": "Discounts & promo codes",
+    "personalDetails": "Personal Details",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "inCart": "In Cart",
+    "wishlist": "Wishlist",
+    "backToAccount": "Back to Account"
+  },
+  "orders": {
+    "title": "My Orders",
+    "subtitle": "Track and manage your purchases",
+    "empty": "No orders yet",
+    "emptyDesc": "When you place an order, it will appear here so you can track its status.",
+    "startShopping": "Start Shopping"
+  },
+  "wishlistPage": {
+    "title": "My Wishlist",
+    "itemsSaved": "{{count}} item saved",
+    "itemsSaved_plural": "{{count}} items saved",
+    "empty": "Your wishlist is empty",
+    "emptyDesc": "Save items you love to your wishlist and come back to them anytime.",
+    "explore": "Explore Collections",
+    "movedToCart": "Moved to cart!"
+  },
+  "voucherPage": {
+    "title": "Vouchers",
+    "subtitle": "Your promo codes and discount vouchers",
+    "haveCode": "Have a promo code?",
+    "enterCode": "Enter voucher code",
+    "apply": "Apply",
+    "available": "Available Vouchers",
+    "invalidCode": "Invalid voucher code",
+    "minSpend": "Min. spend",
+    "expires": "Expires"
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to Home"
+  }
+}

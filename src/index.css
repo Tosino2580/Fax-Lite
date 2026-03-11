@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #000;
+    color: #fff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Playfair Display", Georgia, serif;
+  }
+
+  ::selection {
+    background-color: #eab308;
+    color: #000;
+  }
+}
+
+@layer utilities {
+  .font-cinzel {
+    font-family: "Cormorant Garamond", Georgia, serif;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

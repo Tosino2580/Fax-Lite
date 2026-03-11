@@ -1,0 +1,182 @@
+{
+  "nav": {
+    "men": "Hommes",
+    "women": "Femmes",
+    "kids": "Enfants",
+    "collections": "Collections",
+    "myAccount": "Mon Compte",
+    "orders": "Commandes",
+    "wishlist": "Favoris",
+    "vouchers": "Bons",
+    "signOut": "Déconnexion",
+    "logIn": "Connexion",
+    "register": "S'inscrire"
+  },
+  "menu": {
+    "jalabiya": "Jalabiya",
+    "kaftans": "Kaftans & Chemises",
+    "agbada": "Agbada",
+    "casuals": "Décontractés",
+    "tshirts": "T-Shirts",
+    "pants": "Pantalons",
+    "abaya": "Abaya",
+    "cropTop": "Crop Top"
+  },
+  "hero": {
+    "badge": "Nouvelle Collection",
+    "title": "Découvrez la Mode Africaine Premium",
+    "subtitle": "Des pièces artisanales qui célèbrent l'héritage et le style contemporain. Explorez notre collection.",
+    "cta": "Acheter Maintenant"
+  },
+  "arrivals": {
+    "subtitle": "Sélectionné Pour Vous",
+    "title": "Nouveautés"
+  },
+  "viewAll": "Voir Tous les Produits",
+  "carousel": {
+    "subtitle": "Explorer",
+    "title": "Acheter par Catégorie"
+  },
+  "story": {
+    "subtitle": "Notre Héritage",
+    "title": "Notre Histoire",
+    "heading": "Mode Afro : La Quête Passionnée de FAX Collections pour Révéler l'Âme de l'Afrique",
+    "p1": "Notre voyage commence dans la ville animée de Lagos, où l'âme de la mode afro pulse à travers des motifs et des couleurs vibrantes. C'est un lieu où des artisans transforment des vêtements en toiles qui partagent des histoires de résilience, de fierté et d'un lien profond avec le continent.",
+    "p2": "Chaque pièce de notre collection est un témoignage de la riche tapisserie de la culture africaine — moderne, audacieuse et authentique sans compromis."
+  },
+  "collections": {
+    "subtitle": "Parcourir Notre Catalogue",
+    "title": "Toutes les Collections",
+    "description": "Explorez notre gamme complète de pièces de mode africaine artisanales, de l'Agbada traditionnel aux crop tops contemporains."
+  },
+  "kids": {
+    "subtitle": "Pour les Petits",
+    "title": "Collection Enfants",
+    "comingSoon": "Bientôt Disponible",
+    "comingSoonDesc": "Nous créons une collection incroyable pour les enfants. Restez à l'écoute pour une mode africaine vibrante et confortable pour les petits.",
+    "browseOther": "Parcourir les Autres Collections"
+  },
+  "product": {
+    "new": "Nouveau",
+    "addToCart": "Ajouter au Panier",
+    "size": "Taille",
+    "qty": "Qté",
+    "onlyLeft": "Plus que {{count}} en stock",
+    "off": "REMISE",
+    "notFound": "Produit non trouvé",
+    "backHome": "Retour à l'Accueil",
+    "home": "Accueil",
+    "addedToWishlist": "Ajouté aux favoris !",
+    "removedFromWishlist": "Retiré des favoris",
+    "product": "produit",
+    "products": "produits"
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "emptyHint": "Ajoutez des articles pour commencer",
+    "size": "Taille",
+    "qty": "Qté",
+    "subtotal": "Sous-total",
+    "checkout": "Passer à la Caisse",
+    "continueShopping": "Continuer les Achats"
+  },
+  "search": {
+    "placeholder": "Rechercher des produits...",
+    "startTyping": "Commencez à taper pour rechercher tous les produits",
+    "noResults": "Aucun résultat pour",
+    "tryDifferent": "Essayez un autre terme de recherche",
+    "result": "résultat",
+    "results": "résultats"
+  },
+  "footer": {
+    "newsletter": "Restez Informé",
+    "newsletterDesc": "Recevez des offres exclusives et les nouveautés directement dans votre boîte mail.",
+    "emailPlaceholder": "Entrez votre email",
+    "subscribe": "S'abonner",
+    "brand": "Mode africaine premium pour le monde moderne. Des pièces artisanales qui célèbrent l'héritage et le style contemporain.",
+    "quickLinks": "Liens Rapides",
+    "blog": "Blog",
+    "faqs": "FAQ",
+    "trackOrder": "Suivre Commande",
+    "contactUs": "Contactez-nous",
+    "information": "Informations",
+    "terms": "Conditions d'Utilisation",
+    "returnPolicy": "Politique de Retour",
+    "deliveryPolicy": "Politique de Livraison",
+    "privacyPolicy": "Politique de Confidentialité",
+    "followUs": "Suivez-nous",
+    "rights": "FAX Collections. Tous droits réservés."
+  },
+  "auth": {
+    "welcomeBack": "Bienvenue",
+    "signInDesc": "Connectez-vous à votre compte FAX Collections",
+    "email": "Adresse Email",
+    "password": "Mot de Passe",
+    "signIn": "Se Connecter",
+    "signingIn": "Connexion en cours...",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "createOne": "Créer un compte",
+    "createAccount": "Créer un Compte",
+    "joinDesc": "Rejoignez FAX Collections pour la meilleure mode africaine",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "confirmPassword": "Confirmer le Mot de Passe",
+    "minChars": "Min. 6 caractères",
+    "reEnter": "Ressaisissez le mot de passe",
+    "creatingAccount": "Création du Compte...",
+    "alreadyHave": "Vous avez déjà un compte ?",
+    "signInLink": "Se connecter",
+    "welcomeToast": "Bienvenue !",
+    "accountCreated": "Compte créé avec succès !",
+    "passwordsMismatch": "Les mots de passe ne correspondent pas"
+  },
+  "account": {
+    "title": "Mon Compte",
+    "subtitle": "Gérez votre profil et vos préférences",
+    "personalInfo": "Infos personnelles & paramètres",
+    "trackOrders": "Suivre & gérer les commandes",
+    "savedItems": "Vos articles sauvegardés",
+    "discounts": "Réductions & codes promo",
+    "personalDetails": "Détails Personnels",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "inCart": "Au Panier",
+    "wishlist": "Favoris",
+    "backToAccount": "Retour au Compte"
+  },
+  "orders": {
+    "title": "Mes Commandes",
+    "subtitle": "Suivez et gérez vos achats",
+    "empty": "Aucune commande",
+    "emptyDesc": "Quand vous passez une commande, elle apparaîtra ici pour que vous puissiez suivre son statut.",
+    "startShopping": "Commencer les Achats"
+  },
+  "wishlistPage": {
+    "title": "Mes Favoris",
+    "itemsSaved": "{{count}} article sauvegardé",
+    "itemsSaved_plural": "{{count}} articles sauvegardés",
+    "empty": "Vos favoris sont vides",
+    "emptyDesc": "Sauvegardez les articles que vous aimez dans vos favoris et revenez-y à tout moment.",
+    "explore": "Explorer les Collections",
+    "movedToCart": "Déplacé dans le panier !"
+  },
+  "voucherPage": {
+    "title": "Bons de Réduction",
+    "subtitle": "Vos codes promo et bons de réduction",
+    "haveCode": "Vous avez un code promo ?",
+    "enterCode": "Entrez le code du bon",
+    "apply": "Appliquer",
+    "available": "Bons Disponibles",
+    "invalidCode": "Code de bon invalide",
+    "minSpend": "Dépense min.",
+    "expires": "Expire"
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Page Non Trouvée",
+    "description": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'Accueil"
+  }
+}
