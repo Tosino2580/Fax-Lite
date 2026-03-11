@@ -2,6 +2,7 @@ import express from 'express';
 import {
     getAllOrders,
     getOrderById,
+    getMyOrderById,
     updateOrderStatus,
     getOrderStats,
     placeOrder,
@@ -19,6 +20,7 @@ orderRouter.get('/track/:id', trackOrder);
 // Customer routes (authenticated user)
 orderRouter.post('/place', authMiddleware, placeOrder);
 orderRouter.get('/my-orders', authMiddleware, getMyOrders);
+orderRouter.get('/my-order/:id', authMiddleware, getMyOrderById);
 
 // Admin routes
 orderRouter.get('/', adminAuth, getAllOrders);

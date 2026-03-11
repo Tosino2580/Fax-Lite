@@ -121,6 +121,20 @@ const placeOrder = async (req, res) => {
     }
 };
 
+// GET /api/orders/my-order/:id — authenticated user gets their own order by ID
+const getMyOrderById = async (req, res) => {
+    try {
+        const order = await Order.findOne({ _id: req.params.id, user: req.userId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+        res.json({ success: true, order });
+    } catch (error) {
+        console.error('getMyOrderById error:', error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // GET /api/orders/my-orders — authenticated user gets their own orders
 const getMyOrders = async (req, res) => {
     try {
@@ -160,4 +174,4 @@ const trackOrder = async (req, res) => {
     }
 };
 
-export { getAllOrders, getOrderById, updateOrderStatus, getOrderStats, placeOrder, getMyOrders, trackOrder };
+export { getAllOrders, getOrderById, getMyOrderById, updateOrderStatus, getOrderStats, placeOrder, getMyOrders, trackOrder };
