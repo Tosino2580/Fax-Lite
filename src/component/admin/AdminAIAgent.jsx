@@ -150,7 +150,7 @@ export default function AdminAIAgent() {
           </div>
           AI Phone Agent
         </h1>
-        <p className="text-zinc-500 text-sm mt-2 ml-13">
+        <p className="text-zinc-500 text-xs sm:text-sm mt-2 ml-0 sm:ml-[3.25rem]">
           Automated phone support powered by Vapi.ai — handles customer calls 24/7
         </p>
       </motion.div>
@@ -161,7 +161,7 @@ export default function AdminAIAgent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className={`rounded-2xl p-5 border ${
+          className={`rounded-2xl p-4 sm:p-5 border ${
             hasAssistant && hasPhone
               ? 'bg-green-400/5 border-green-400/20'
               : hasAssistant
@@ -169,23 +169,23 @@ export default function AdminAIAgent() {
               : 'bg-yellow-400/5 border-yellow-400/20'
           }`}
         >
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
               hasAssistant && hasPhone ? 'bg-green-400/20' : hasAssistant ? 'bg-blue-400/20' : 'bg-yellow-400/20'
             }`}>
               {hasAssistant && hasPhone
-                ? <FaCheckCircle className="text-green-400 text-lg" />
-                : <FaPhone className={`${hasAssistant ? 'text-blue-400' : 'text-yellow-400'} text-lg`} />}
+                ? <FaCheckCircle className="text-green-400 text-base sm:text-lg" />
+                : <FaPhone className={`${hasAssistant ? 'text-blue-400' : 'text-yellow-400'} text-base sm:text-lg`} />}
             </div>
-            <div className="flex-1">
-              <p className={`font-semibold ${hasAssistant && hasPhone ? 'text-green-400' : hasAssistant ? 'text-blue-400' : 'text-yellow-400'}`}>
+            <div className="flex-1 min-w-0">
+              <p className={`font-semibold text-sm sm:text-base ${hasAssistant && hasPhone ? 'text-green-400' : hasAssistant ? 'text-blue-400' : 'text-yellow-400'}`}>
                 {hasAssistant && hasPhone
                   ? 'AI Agent Fully Active'
                   : hasAssistant
                   ? 'Assistant Created — Phone Number Needed'
                   : 'AI Agent Not Configured'}
               </p>
-              <p className="text-zinc-400 text-sm mt-0.5">
+              <p className="text-zinc-400 text-xs sm:text-sm mt-0.5">
                 {hasAssistant && hasPhone
                   ? 'Your AI agent is live and ready to handle customer calls.'
                   : hasAssistant
@@ -193,12 +193,12 @@ export default function AdminAIAgent() {
                   : 'Set up your AI phone agent to start handling customer calls automatically.'}
               </p>
             </div>
-            <div className="flex gap-2 flex-shrink-0">
+            <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
               {!hasAssistant && (
                 <button
                   onClick={handleSetup}
                   disabled={setupLoading}
-                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-60 cursor-pointer"
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer w-full sm:w-auto"
                 >
                   {setupLoading ? <FaSpinner className="animate-spin text-xs" /> : <FaPlay className="text-xs" />}
                   {setupLoading ? 'Setting up...' : 'Activate Agent'}
@@ -208,7 +208,7 @@ export default function AdminAIAgent() {
                 <button
                   onClick={handlePurchaseNumber}
                   disabled={phoneLoading}
-                  className="bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-60 cursor-pointer"
+                  className="bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer w-full sm:w-auto"
                 >
                   {phoneLoading ? <FaSpinner className="animate-spin text-xs" /> : <FaPlus className="text-xs" />}
                   {phoneLoading ? 'Getting number...' : 'Get Phone Number'}
@@ -221,7 +221,7 @@ export default function AdminAIAgent() {
 
       {/* Message */}
       {message && (
-        <div className={`rounded-xl p-4 text-sm ${
+        <div className={`rounded-xl p-3 sm:p-4 text-xs sm:text-sm break-words ${
           message.type === 'success' ? 'bg-green-400/10 text-green-400 border border-green-400/20' : 'bg-red-400/10 text-red-400 border border-red-400/20'
         }`}>
           {message.text}
@@ -242,9 +242,9 @@ export default function AdminAIAgent() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6"
+            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 sm:p-6"
           >
-            <h2 className="text-white font-semibold text-base mb-4 flex items-center gap-2">
+            <h2 className="text-white font-semibold text-sm sm:text-base mb-4 flex items-center gap-2">
               <FaRobot className="text-purple-400 text-sm" /> Agent Capabilities
             </h2>
             <div className="space-y-3">
@@ -283,10 +283,10 @@ export default function AdminAIAgent() {
               <div className="mt-4 pt-4 border-t border-zinc-800">
                 <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-3">Phone Numbers</h3>
                 {phoneNumbers.map((pn) => (
-                  <div key={pn.id} className="flex items-center gap-3 bg-zinc-900/50 rounded-xl p-3 mb-2">
-                    <FaPhoneAlt className="text-green-400 text-xs" />
-                    <span className="text-white text-sm font-mono">{pn.number || 'Pending assignment'}</span>
-                    <span className="ml-auto text-green-400 text-xs font-medium">Active</span>
+                  <div key={pn.id} className="flex items-center gap-3 bg-zinc-900/50 rounded-xl p-3 mb-2 min-w-0">
+                    <FaPhoneAlt className="text-green-400 text-xs flex-shrink-0" />
+                    <span className="text-white text-xs sm:text-sm font-mono truncate">{pn.number || 'Pending assignment'}</span>
+                    <span className="ml-auto text-green-400 text-xs font-medium flex-shrink-0">Active</span>
                   </div>
                 ))}
               </div>
@@ -310,15 +310,15 @@ export default function AdminAIAgent() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6"
+            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 sm:p-6"
           >
-            <h2 className="text-white font-semibold text-base mb-4 flex items-center gap-2">
+            <h2 className="text-white font-semibold text-sm sm:text-base mb-4 flex items-center gap-2">
               <FaPhoneAlt className="text-yellow-400 text-sm" /> Test Call
             </h2>
-            <p className="text-zinc-400 text-sm mb-4">
+            <p className="text-zinc-400 text-xs sm:text-sm mb-4">
               Make a test call to hear your AI agent in action. Enter your phone number with country code (e.g., +234...).
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="tel"
                 value={testPhone}
@@ -329,7 +329,7 @@ export default function AdminAIAgent() {
               <button
                 onClick={handleTestCall}
                 disabled={testLoading || !hasAssistant || !hasPhone}
-                className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-5 py-3 rounded-xl transition-colors text-sm flex items-center gap-2 disabled:opacity-40 cursor-pointer"
+                className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-5 py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-40 cursor-pointer"
               >
                 {testLoading ? <FaSpinner className="animate-spin text-xs" /> : <FaPhone className="text-xs" />}
                 Call
