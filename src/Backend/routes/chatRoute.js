@@ -12,101 +12,104 @@ ABOUT FAX COLLECTIONS:
 - Website: faxcollections.com
 - Business hours: Monday-Friday 9AM-6PM, Saturday 10AM-4PM, Sunday closed
 
-YOUR CAPABILITIES:
-1. ORDER TRACKING: When a customer provides an order ID, use the track_order tool to look up their order
-2. PRODUCT SEARCH: When a customer asks about products, use the search_products tool to find them
-3. RETURNS & EXCHANGES: 7-day return window from delivery, items must be unworn with original tags, custom orders non-refundable, free exchanges for wrong sizes, refunds in 3-5 business days
-4. DELIVERY: Lagos 1-3 days, other Nigerian states 3-7 days, international 7-14 days, free shipping over ₦50,000
-5. PAYMENT: Card via Paystack (Visa, Mastercard, Verve), bank transfer, cash on delivery (Lagos only)
-6. SIZING: S (36-38"), M (38-40"), L (40-42"), XL (42-44"), XXL (44-46") — recommend sizing up for comfort
+POLICIES:
+- RETURNS & EXCHANGES: 7-day return window from delivery, items must be unworn with original tags, custom orders non-refundable, free exchanges for wrong sizes, refunds in 3-5 business days
+- DELIVERY: Lagos 1-3 days, other Nigerian states 3-7 days, international 7-14 days, free shipping over ₦50,000
+- PAYMENT: Card via Paystack (Visa, Mastercard, Verve), bank transfer, cash on delivery (Lagos only)
+- SIZING: S (36-38"), M (38-40"), L (40-42"), XL (42-44"), XXL (44-46") — recommend sizing up for comfort
 
 STYLE:
 - Be warm, concise, and helpful
 - Use simple, clear language
 - If you can't resolve something, suggest emailing support@faxcollections.com or using the contact form
-- Don't make up information — use the tools to get real data
+- Only share product/order info from the CONTEXT DATA provided below — don't make up products or prices
 - Keep responses short (2-4 sentences max unless detailed info is needed)`;
 
-const TOOLS = [
-  {
-    type: 'function',
-    function: {
-      name: 'track_order',
-      description: 'Look up an order by its ID. Use when customer wants to check order status.',
-      parameters: {
-        type: 'object',
-        properties: {
-          order_id: { type: 'string', description: 'The order ID provided by the customer' },
-        },
-        required: ['order_id'],
-      },
-    },
-  },
-  {
-    type: 'function',
-    function: {
-      name: 'search_products',
-      description: 'Search for products by name or category. Use when customer asks about products.',
-      parameters: {
-        type: 'object',
-        properties: {
-          query: { type: 'string', description: 'Product name or category to search for' },
-        },
-        required: ['query'],
-      },
-    },
-  },
-];
+// Pre-fetch relevant data based on the user's message
+async function getContextData(msg) {
+  const lower = msg.toLowerCase();
+  let context = '';
 
-// Execute a tool call and return the result
-async function executeTool(name, args) {
-  if (name === 'track_order') {
-    const id = (args.order_id || '').trim().replace(/^#/, '');
-    let order = null;
+  // Check for order tracking
+  const idMatch = lower.match(/[a-f0-9]{8,24}/i);
+  if (idMatch || lower.includes('track') || lower.includes('order') || lower.includes('status')) {
+    if (idMatch) {
+      const id = idMatch[0].trim().replace(/^#/, '');
+      let order = null;
 
-    if (id.match(/^[0-9a-fA-F]{24}$/)) {
-      order = await Order.findById(id);
-    }
-    if (!order) {
-      const allOrders = await Order.find({}, '_id items totalAmount status shippingAddress createdAt');
-      order = allOrders.find((o) => o._id.toString().slice(-8).toUpperCase() === id.toUpperCase());
-    }
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        order = await Order.findById(id);
+      }
+      if (!order) {
+        const allOrders = await Order.find({}, '_id items totalAmount status shippingAddress createdAt');
+        order = allOrders.find((o) => o._id.toString().slice(-8).toUpperCase() === id.toUpperCase());
+      }
 
-    if (order) {
-      const itemNames = order.items.map((i) => i.name).join(', ');
-      return `Order found! ID: ...${order._id.toString().slice(-8).toUpperCase()}. Status: ${order.status}. Items: ${itemNames}. Total: ₦${order.totalAmount?.toLocaleString()}. Placed: ${new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}.`;
+      if (order) {
+        const itemNames = order.items.map((i) => i.name).join(', ');
+        context += `\n\nORDER DATA: Order ID: ...${order._id.toString().slice(-8).toUpperCase()}. Status: ${order.status}. Items: ${itemNames}. Total: ₦${order.totalAmount?.toLocaleString()}. Placed: ${new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}.`;
+      } else {
+        context += `\n\nORDER DATA: No order found with ID "${id}". Suggest the customer double-check their order ID from their confirmation email or My Orders page.`;
+      }
     }
-    return 'Order not found. Please double-check the order ID from your confirmation email or My Orders page.';
   }
 
-  if (name === 'search_products') {
-    const query = (args.query || '').toLowerCase();
-    const products = await Product.find({
-      $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { category: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-      ],
-    }).limit(5);
+  // Check for product queries
+  const productKeywords = ['product', 'buy', 'purchase', 'shop', 'dress', 'wear', 'cloth', 'agbada', 'kaftan', 'jalabiya', 'collection', 'catalog', 'price', 'cost', 'how much', 'available', 'stock', 'sell', 'have'];
+  const wantsProducts = productKeywords.some((k) => lower.includes(k));
+
+  if (wantsProducts) {
+    // Extract search terms or fetch popular products
+    const searchTerms = ['agbada', 'kaftan', 'jalabiya', 'shirt', 'cap', 'pant', 'dress', 'suit', 'trouser'];
+    const found = searchTerms.find((t) => lower.includes(t));
+    const query = found || '';
+
+    let products;
+    if (query) {
+      products = await Product.find({
+        $or: [
+          { name: { $regex: query, $options: 'i' } },
+          { category: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } },
+        ],
+      }).limit(5);
+    } else {
+      // Show some featured products
+      products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+    }
 
     if (products.length > 0) {
-      const list = products.map((p) => `${p.name} — ₦${p.price?.toLocaleString()}${p.category ? ` (${p.category})` : ''}`).join('; ');
-      return `Found ${products.length} product(s): ${list}.`;
+      const list = products.map((p) => `• ${p.name} — ₦${p.price?.toLocaleString()}${p.category ? ` (${p.category})` : ''}`).join('\n');
+      context += `\n\nPRODUCT DATA:\n${list}`;
+    } else {
+      context += `\n\nPRODUCT DATA: No specific products found. Suggest browsing the full collection at faxcollections.com.`;
     }
-    return `No products found matching "${args.query}". Browse our full collection at faxcollections.com.`;
   }
 
-  return 'Unknown tool.';
+  return context;
 }
 
-// Smart fallback responses (works without OpenAI)
+// Smart fallback responses (works without Groq)
 async function getSmartReply(lastMsg) {
   const msg = lastMsg.toLowerCase();
 
   if (msg.includes('track') || msg.includes('order') || msg.includes('status')) {
     const idMatch = msg.match(/[a-f0-9]{8,24}/i);
     if (idMatch) {
-      return await executeTool('track_order', { order_id: idMatch[0] });
+      const id = idMatch[0].trim().replace(/^#/, '');
+      let order = null;
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        order = await Order.findById(id);
+      }
+      if (!order) {
+        const allOrders = await Order.find({}, '_id items totalAmount status shippingAddress createdAt');
+        order = allOrders.find((o) => o._id.toString().slice(-8).toUpperCase() === id.toUpperCase());
+      }
+      if (order) {
+        const itemNames = order.items.map((i) => i.name).join(', ');
+        return `Order found! ID: ...${order._id.toString().slice(-8).toUpperCase()}. Status: ${order.status}. Items: ${itemNames}. Total: ₦${order.totalAmount?.toLocaleString()}. Placed: ${new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}.`;
+      }
+      return 'Order not found. Please double-check the order ID from your confirmation email or My Orders page.';
     }
     return "I'd love to help you track your order! Please share your order ID. You can find it in your confirmation email or on the My Orders page.";
   }
@@ -116,11 +119,6 @@ async function getSmartReply(lastMsg) {
   }
 
   if (msg.includes('product') || msg.includes('agbada') || msg.includes('kaftan') || msg.includes('jalabiya') || msg.includes('collection') || msg.includes('catalog')) {
-    const searchTerms = ['agbada', 'kaftan', 'jalabiya', 'shirt', 'cap', 'pant'];
-    const found = searchTerms.find((t) => msg.includes(t));
-    if (found) {
-      return await executeTool('search_products', { query: found });
-    }
     return "We have a beautiful collection of African menswear including Agbadas, Kaftans, and Jalabiya. Browse our full catalog at faxcollections.com/collections or tell me what specific style you're looking for!";
   }
 
@@ -141,7 +139,7 @@ async function getSmartReply(lastMsg) {
   }
 
   if (msg.includes('size') || msg.includes('sizing') || msg.includes('fit') || msg.includes('measure')) {
-    return "Our sizing guide: S (Chest 36-38\"), M (38-40\"), L (40-42\"), XL (42-44\"), XXL (44-46\"). When in doubt, we recommend sizing up for a comfortable fit. Bespoke/custom sizing is also available!";
+    return 'Our sizing guide: S (Chest 36-38"), M (38-40"), L (40-42"), XL (42-44"), XXL (44-46"). When in doubt, we recommend sizing up for a comfortable fit. Bespoke/custom sizing is also available!';
   }
 
   if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('good morning') || msg.includes('good afternoon') || msg.includes('good evening')) {
@@ -172,11 +170,10 @@ async function getSmartReply(lastMsg) {
     return "Yes, we offer bespoke/custom tailoring! You can get any of our designs customized to your exact measurements. Contact us through the website's contact form or email support@faxcollections.com with your requirements.";
   }
 
-  // Default for anything else
   return "Thank you for reaching out to FAX Collections! I can help with: order tracking, product info, sizing, returns, delivery timelines, and payment options. What would you like to know?";
 }
 
-// Chat endpoint using OpenAI API with smart fallback
+// Chat endpoint
 chatRouter.post('/', async (req, res) => {
   try {
     const { messages } = req.body;
@@ -194,14 +191,18 @@ chatRouter.post('/', async (req, res) => {
       return res.json({ success: true, reply });
     }
 
-    // Try Groq (free, fast, OpenAI-compatible API)
+    // Try Groq with context injection (no tool calling needed)
     try {
+      // Pre-fetch relevant data and inject into system prompt
+      const contextData = await getContextData(lastMsg);
+      const fullSystemPrompt = SYSTEM_PROMPT + contextData;
+
       const aiMessages = [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: fullSystemPrompt },
         ...messages.slice(-10),
       ];
 
-      let response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -210,14 +211,12 @@ chatRouter.post('/', async (req, res) => {
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
           messages: aiMessages,
-          tools: TOOLS,
-          tool_choice: 'auto',
           max_tokens: 500,
           temperature: 0.7,
         }),
       });
 
-      let data = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         console.error('Groq error:', data);
@@ -225,47 +224,7 @@ chatRouter.post('/', async (req, res) => {
         return res.json({ success: true, reply });
       }
 
-      let assistantMessage = data.choices?.[0]?.message;
-
-      // Handle tool calls (up to 3 rounds)
-      let rounds = 0;
-      while (assistantMessage?.tool_calls && rounds < 3) {
-        rounds++;
-        aiMessages.push(assistantMessage);
-
-        for (const toolCall of assistantMessage.tool_calls) {
-          const fnName = toolCall.function.name;
-          const fnArgs = JSON.parse(toolCall.function.arguments || '{}');
-          const result = await executeTool(fnName, fnArgs);
-
-          aiMessages.push({
-            role: 'tool',
-            tool_call_id: toolCall.id,
-            content: result,
-          });
-        }
-
-        response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${groqKey}`,
-          },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: aiMessages,
-            tools: TOOLS,
-            tool_choice: 'auto',
-            max_tokens: 500,
-            temperature: 0.7,
-          }),
-        });
-
-        data = await response.json();
-        assistantMessage = data.choices?.[0]?.message;
-      }
-
-      const reply = assistantMessage?.content || "I'm sorry, I couldn't generate a response. Please try again.";
+      const reply = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
       return res.json({ success: true, reply });
     } catch (aiError) {
       console.error('Groq call failed, using fallback:', aiError.message);
