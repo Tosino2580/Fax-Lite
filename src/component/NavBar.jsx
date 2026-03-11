@@ -275,18 +275,32 @@ const NavBar = () => {
                             )}
                         </div>
 
-                        {/* Mobile Language Switcher */}
-                        <div className='flex flex-col gap-2 mt-8 pt-6 border-t border-white/10'>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{currentLang.name}</p>
-                            {languages.filter(l => l.code !== i18n.language).map(lang => (
-                                <button
-                                    key={lang.code}
-                                    onClick={() => i18n.changeLanguage(lang.code)}
-                                    className="text-sm text-gray-400 hover:text-yellow-400 transition-colors cursor-pointer text-left"
-                                >
-                                    {lang.name}
-                                </button>
-                            ))}
+                        {/* Mobile Language & Currency Switcher */}
+                        <div className='flex gap-6 mt-8 pt-6 border-t border-white/10'>
+                            <div className='flex flex-col gap-2 flex-1'>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Language</p>
+                                {languages.map(lang => (
+                                    <button
+                                        key={lang.code}
+                                        onClick={() => i18n.changeLanguage(lang.code)}
+                                        className={`text-sm transition-colors cursor-pointer text-left ${lang.code === i18n.language ? 'text-yellow-400 font-medium' : 'text-gray-400 hover:text-yellow-400'}`}
+                                    >
+                                        {lang.name}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className='flex flex-col gap-2 flex-1'>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Currency</p>
+                                {Object.keys(currencies).map(code => (
+                                    <button
+                                        key={code}
+                                        onClick={() => changeCurrency(code)}
+                                        className={`text-sm transition-colors cursor-pointer text-left ${code === currencyCode ? 'text-yellow-400 font-medium' : 'text-gray-400 hover:text-yellow-400'}`}
+                                    >
+                                        {currencies[code].symbol} {code}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </motion.div>
                 )}
