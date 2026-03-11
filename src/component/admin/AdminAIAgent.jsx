@@ -87,36 +87,33 @@ export default function AdminAIAgent() {
     }
   };
 
-  // Import Twilio phone number
-  const handlePurchaseNumber = async () => {
-    if (!twilioSid || !twilioToken || !twilioNumber) {
+  // Get phone number (Vapi free or Twilio import)
+  const handleGetNumber = async (useTwilio = false) => {
+    if (useTwilio && (!twilioSid || !twilioToken || !twilioNumber)) {
       setMessage({ type: 'error', text: 'Please fill in all three Twilio fields.' });
       return;
     }
     setPhoneLoading(true);
     setMessage(null);
     try {
+      const body = useTwilio
+        ? { twilioAccountSid: twilioSid.trim(), twilioAuthToken: twilioToken.trim(), twilioPhoneNumber: twilioNumber.trim() }
+        : {};
       const res = await fetch(`${API_BASE}/api/vapi/purchase-number`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          twilioAccountSid: twilioSid.trim(),
-          twilioAuthToken: twilioToken.trim(),
-          twilioPhoneNumber: twilioNumber.trim(),
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
-        setTwilioSid('');
-        setTwilioToken('');
-        setTwilioNumber('');
+        if (useTwilio) { setTwilioSid(''); setTwilioToken(''); setTwilioNumber(''); }
         fetchStatus();
       } else {
         setMessage({ type: 'error', text: data.message });
       }
     } catch {
-      setMessage({ type: 'error', text: 'Failed to import Twilio number.' });
+      setMessage({ type: 'error', text: 'Failed to get phone number.' });
     } finally {
       setPhoneLoading(false);
     }
@@ -219,6 +216,16 @@ export default function AdminAIAgent() {
                   {setupLoading ? 'Setting up...' : 'Activate Agent'}
                 </button>
               )}
+              {hasAssistant && !hasPhone && (
+                <button
+                  onClick={() => handleGetNumber(false)}
+                  disabled={phoneLoading}
+                  className="bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer w-full sm:w-auto"
+                >
+                  {phoneLoading ? <FaSpinner className="animate-spin text-xs" /> : <FaPlus className="text-xs" />}
+                  {phoneLoading ? 'Getting number...' : 'Get Phone Number'}
+                </button>
+              )}
             </div>
           </div>
         </motion.div>
@@ -301,9 +308,9 @@ export default function AdminAIAgent() {
             {hasAssistant && !hasPhone && (
               <div className="mt-5 pt-5 border-t border-zinc-800">
                 <div className="bg-blue-400/5 border border-blue-400/20 rounded-xl p-4">
-                  <p className="text-blue-400 text-sm font-medium mb-1">Connect Your Twilio Number</p>
+                  <p className="text-blue-400 text-sm font-medium mb-1">Option B: Import Your Own Twilio Number</p>
                   <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                    Import your own Twilio phone number so customers can call your AI agent directly. Get a free Twilio account and number at twilio.com.
+                    If the Vapi number above doesn&apos;t work correctly, import your own dedicated Twilio number instead. Get a free Twilio account at twilio.com.
                   </p>
                   <div className="space-y-3">
                     <div>
@@ -346,7 +353,7 @@ export default function AdminAIAgent() {
                       />
                     </div>
                     <button
-                      onClick={handlePurchaseNumber}
+                      onClick={() => handleGetNumber(true)}
                       disabled={phoneLoading}
                       className="w-full bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
                     >

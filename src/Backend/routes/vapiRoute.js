@@ -127,7 +127,7 @@ vapiRouter.get('/agent-status', adminAuth, async (req, res) => {
   }
 });
 
-// ─── Admin: Import a Twilio phone number ────────────────────────────────────
+// ─── Admin: Get a phone number (Vapi or Twilio) ─────────────────────────────
 vapiRouter.post('/purchase-number', adminAuth, async (req, res) => {
   try {
     if (!process.env.VAPI_API_KEY) {
@@ -135,13 +135,7 @@ vapiRouter.post('/purchase-number', adminAuth, async (req, res) => {
     }
 
     const { twilioAccountSid, twilioAuthToken, twilioPhoneNumber } = req.body;
-
-    if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
-      return res.status(400).json({
-        success: false,
-        message: 'Twilio Account SID, Auth Token, and Phone Number are all required.',
-      });
-    }
+    const useTwilio = twilioAccountSid && twilioAuthToken && twilioPhoneNumber;
 
     // Get the first assistant to link
     const assistantRes = await vapiAPI.get('/assistant');
@@ -152,45 +146,83 @@ vapiRouter.post('/purchase-number', adminAuth, async (req, res) => {
 
     const assistantId = assistants[0].id;
 
-    // 1. Create Twilio credential in Vapi
-    let credentialId;
-    try {
-      const credRes = await vapiAPI.post('/credential', {
-        provider: 'twilio',
-        authToken: twilioAuthToken,
-        accountSid: twilioAccountSid,
-      });
-      credentialId = credRes.data?.id;
-    } catch (credErr) {
-      // If credential already exists, try to continue
-      const errMsg = credErr.response?.data?.message || credErr.message || '';
-      if (!errMsg.toLowerCase().includes('already') && !errMsg.toLowerCase().includes('duplicate')) {
-        console.error('Vapi credential error:', credErr.response?.data || credErr.message);
-        return res.status(400).json({
-          success: false,
-          message: `Failed to add Twilio credentials to Vapi: ${errMsg}`,
+    if (useTwilio) {
+      // ── Twilio import path ──
+      // 1. Create Twilio credential in Vapi
+      try {
+        await vapiAPI.post('/credential', {
+          provider: 'twilio',
+          authToken: twilioAuthToken,
+          accountSid: twilioAccountSid,
         });
+      } catch (credErr) {
+        const errMsg = credErr.response?.data?.message || credErr.message || '';
+        if (!errMsg.toLowerCase().includes('already') && !errMsg.toLowerCase().includes('duplicate')) {
+          console.error('Vapi credential error:', credErr.response?.data || credErr.message);
+          return res.status(400).json({
+            success: false,
+            message: `Failed to add Twilio credentials: ${errMsg}`,
+          });
+        }
+      }
+
+      // 2. Import the Twilio phone number
+      const phoneRes = await vapiAPI.post('/phone-number', {
+        provider: 'twilio',
+        number: twilioPhoneNumber,
+        twilioAccountSid,
+        twilioAuthToken,
+        assistantId,
+      });
+
+      return res.json({
+        success: true,
+        message: `Twilio number imported: ${phoneRes.data.number}`,
+        phoneNumber: { id: phoneRes.data.id, number: phoneRes.data.number },
+      });
+    }
+
+    // ── Vapi free number path ──
+    // First check if there are existing unlinked phone numbers we can reassign
+    const existingPhones = await vapiAPI.get('/phone-number');
+    const unlinkedPhone = (existingPhones.data || []).find(
+      (p) => !p.assistantId || p.assistantId !== assistantId
+    );
+
+    if (unlinkedPhone) {
+      // Reassign existing number to our assistant
+      try {
+        await vapiAPI.patch(`/phone-number/${unlinkedPhone.id}`, { assistantId });
+        return res.json({
+          success: true,
+          message: `Phone number ${unlinkedPhone.number} linked to your FAX Collections assistant!`,
+          phoneNumber: { id: unlinkedPhone.id, number: unlinkedPhone.number },
+        });
+      } catch (patchErr) {
+        console.warn('Could not reassign phone:', patchErr.response?.data || patchErr.message);
       }
     }
 
-    // 2. Import the Twilio phone number into Vapi, linked to the assistant
+    // Purchase a new Vapi number linked to our assistant
     const phoneRes = await vapiAPI.post('/phone-number', {
-      provider: 'twilio',
-      number: twilioPhoneNumber,
-      twilioAccountSid,
-      twilioAuthToken,
+      provider: 'vapi',
       assistantId,
     });
 
     res.json({
       success: true,
-      message: `Twilio number imported: ${phoneRes.data.number}`,
+      message: `Phone number purchased: ${phoneRes.data.number}`,
       phoneNumber: { id: phoneRes.data.id, number: phoneRes.data.number },
     });
   } catch (error) {
-    console.error('Vapi import number error:', error.response?.data || error.message);
-    const msg = error.response?.data?.message || error.message || 'Failed to import Twilio number';
-    res.status(500).json({ success: false, message: msg });
+    console.error('Vapi phone number error:', error.response?.data || error.message);
+    const msg = error.response?.data?.message || error.message || 'Failed to get phone number';
+    res.status(500).json({
+      success: false,
+      message: msg.includes('limit')
+        ? 'Free number limit reached. Use the Twilio option below to import your own number instead.'
+        : msg,
+    });
   }
 });
 
