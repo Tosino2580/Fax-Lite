@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FaRobot, FaPhone, FaPhoneAlt, FaPlay, FaCheckCircle, FaTimesCircle, FaSpinner, FaHistory, FaClock, FaUser, FaPlus } from 'react-icons/fa';
 import { useAdmin } from '../../context/AdminContext';
 
-const API_BASE = 'http://localhost:4000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function AdminAIAgent() {
   const { adminToken } = useAdmin();

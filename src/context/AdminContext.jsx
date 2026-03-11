@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AdminContext = createContext();
 
-const API_URL = 'http://localhost:4000/api/users';
+const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/users`;
 
 export const AdminProvider = ({ children }) => {
     const [adminToken, setAdminToken] = useState(localStorage.getItem('fax_admin_token') || null);

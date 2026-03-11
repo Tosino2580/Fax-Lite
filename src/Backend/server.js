@@ -23,8 +23,14 @@ const app = express()
 const port = process.env.PORT || 4000
 
 // Middleware
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://localhost:5174',
+].filter(Boolean)
+
 app.use(cors({
-    origin: [process.env.FRONTEND_URL || 'http://localhost:5173', 'http://localhost:5174'],
+    origin: allowedOrigins,
     credentials: true
 }))
 app.use(express.json({ limit: '10mb' }))
