@@ -8,6 +8,8 @@ import { ProductData } from '../productData/ProductData';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
+import RecentlyViewed from './RecentlyViewed';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -58,6 +60,7 @@ function ProductDetails() {
   const { addToCart, setShowCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
+  const { addRecentlyViewed } = useRecentlyViewed();
 
   if (loading) {
     return (
@@ -121,6 +124,11 @@ function ProductDetails() {
       iconTheme: { primary: '#22c55e', secondary: '#fff' },
     });
   };
+
+  // Track this product as recently viewed
+  useEffect(() => {
+    if (product) addRecentlyViewed(product);
+  }, [product?.id]);
 
   const stockPercent = Math.min(100, Math.max(5, (product.inStock / 20) * 100));
 
@@ -313,6 +321,9 @@ function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* Recently Viewed */}
+      <RecentlyViewed currentProductId={product.id} />
     </div>
   );
 }
