@@ -62,6 +62,11 @@ function ProductDetails() {
   const { formatPrice } = useCurrency();
   const { addRecentlyViewed } = useRecentlyViewed();
 
+  // Track this product as recently viewed (must be before early returns)
+  useEffect(() => {
+    if (product) addRecentlyViewed(product);
+  }, [product?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -124,11 +129,6 @@ function ProductDetails() {
       iconTheme: { primary: '#22c55e', secondary: '#fff' },
     });
   };
-
-  // Track this product as recently viewed
-  useEffect(() => {
-    if (product) addRecentlyViewed(product);
-  }, [product?.id]);
 
   const stockPercent = Math.min(100, Math.max(5, (product.inStock / 20) * 100));
 
