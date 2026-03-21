@@ -300,7 +300,7 @@ const NavBar = () => {
                                             {languages.map(lang => (
                                                 <button
                                                     key={lang.code}
-                                                    onClick={() => { i18n.changeLanguage(lang.code); setMobileLangOpen(false); }}
+                                                    onClick={() => { i18n.changeLanguage(lang.code); setMobileLangOpen(false); setMenuOpen(false); }}
                                                     className={`block w-full text-left px-3 py-2.5 text-sm cursor-pointer transition-colors ${lang.code === i18n.language ? 'text-yellow-400 bg-yellow-400/10' : 'text-gray-300 hover:bg-white/5'}`}
                                                 >
                                                     {lang.name}
@@ -332,7 +332,7 @@ const NavBar = () => {
                                             {Object.keys(currencies).map(code => (
                                                 <button
                                                     key={code}
-                                                    onClick={() => { changeCurrency(code); setMobileCurrOpen(false); }}
+                                                    onClick={() => { changeCurrency(code); setMobileCurrOpen(false); setMenuOpen(false); }}
                                                     className={`block w-full text-left px-3 py-2.5 text-sm cursor-pointer transition-colors ${code === currencyCode ? 'text-yellow-400 bg-yellow-400/10' : 'text-gray-300 hover:bg-white/5'}`}
                                                 >
                                                     {currencies[code].symbol} {code}

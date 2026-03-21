@@ -177,7 +177,7 @@ const AdminLayout = () => {
             </AnimatePresence>
 
             {/* ── Main Content ── */}
-            <div className="flex-1 flex flex-col lg:ml-64 min-h-screen">
+            <div className="flex-1 flex flex-col lg:ml-64 min-h-screen overflow-x-hidden">
                 {/* Top Bar */}
                 <header className="sticky top-0 z-20 bg-zinc-950/90 backdrop-blur border-b border-zinc-800 px-4 lg:px-6 h-14 flex items-center gap-4">
                     {/* Hamburger (mobile) */}

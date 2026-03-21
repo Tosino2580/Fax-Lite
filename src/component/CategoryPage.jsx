@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaChevronRight, FaEye, FaShoppingCart, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const ProductCard = ({ product, basePath, categoryName }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -90,7 +92,37 @@ const ProductCard = ({ product, basePath, categoryName }) => {
   );
 };
 
-const CategoryPage = ({ title, breadcrumbLabel, products, basePath, categoryName }) => {
+const CategoryPage = ({ title, breadcrumbLabel, products = [], basePath, categoryName, apiCategory }) => {
+  const [apiProducts, setApiProducts] = useState([]);
+
+  useEffect(() => {
+    if (!apiCategory) return;
+    fetch(`${API_URL}/api/products?category=${apiCategory}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const localIds = new Set(products.map(p => p.id));
+          const fresh = data.products
+            .filter(p => !localIds.has(p._id))
+            .map(p => ({
+              id: p._id,
+              name: p.name,
+              price: p.price,
+              oldPrice: p.oldPrice || null,
+              image: p.images?.[0] || '',
+              hoverImage: p.images?.[1] || p.images?.[0] || '',
+              badge: p.badge || false,
+              inStock: p.inStock,
+              sizes: p.sizes || [],
+            }));
+          setApiProducts(fresh);
+        }
+      })
+      .catch(() => {});
+  }, [apiCategory]);
+
+  const allProducts = [...products, ...apiProducts];
+
   return (
     <div className="min-h-screen pt-28 pb-16 px-4 md:px-8">
       {/* Header */}
@@ -101,12 +133,12 @@ const CategoryPage = ({ title, breadcrumbLabel, products, basePath, categoryName
           <FaChevronRight className="w-2.5 h-2.5" />
           <span className="text-white">{breadcrumbLabel || title}</span>
         </nav>
-        <p className="text-gray-500 text-sm">{products.length} product{products.length !== 1 ? 's' : ''}</p>
+        <p className="text-gray-500 text-sm">{allProducts.length} product{allProducts.length !== 1 ? 's' : ''}</p>
       </div>
 
       {/* Product Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product) => (
+        {allProducts.map((product) => (
           <ProductCard key={product.id} product={product} basePath={basePath} categoryName={categoryName || title} />
         ))}
       </div>

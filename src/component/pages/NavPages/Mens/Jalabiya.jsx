@@ -6,6 +6,7 @@ const Jalabiya = () => (
     title="Jalabiya"
     products={JalabiyaDatas}
     basePath="/jalabiya"
+    apiCategory="Jalabiya"
   />
 );
 

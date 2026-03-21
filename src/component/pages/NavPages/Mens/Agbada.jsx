@@ -6,6 +6,7 @@ const Agbada = () => (
     title="Agbada"
     products={agbadaDatas}
     basePath="/agbada"
+    apiCategory="Agbada"
   />
 );
 

@@ -7,6 +7,7 @@ const Kaftan = () => (
     breadcrumbLabel="Kaftan / Shirts"
     products={KaftanData}
     basePath="/kafans-shirts"
+    apiCategory="Kaftan"
   />
 );
 
