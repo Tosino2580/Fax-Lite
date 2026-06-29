@@ -1,4 +1,5 @@
 import Order from '../models/Order.js';
+import { logEventToSentinelX } from '../sentinelx-ecommerce-client.js';
 
 // GET /api/orders — admin only, all orders, newest first
 const getAllOrders = async (req, res) => {
@@ -96,10 +97,12 @@ const placeOrder = async (req, res) => {
         const { items, shippingAddress, paymentMethod, totalAmount } = req.body;
 
         if (!items || items.length === 0) {
+            await logEventToSentinelX(req, req.userId || 'anonymous', 'payment_attempt', 'failure', { reason: 'empty_cart' });
             return res.status(400).json({ success: false, message: 'No items in order' });
         }
 
         if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.address || !shippingAddress.city || !shippingAddress.state || !shippingAddress.phone) {
+            await logEventToSentinelX(req, req.userId || 'anonymous', 'payment_attempt', 'failure', { reason: 'missing_shipping_details' });
             return res.status(400).json({ success: false, message: 'Complete shipping address is required' });
         }
 
@@ -114,9 +117,17 @@ const placeOrder = async (req, res) => {
 
         await order.save();
 
+        await logEventToSentinelX(req, req.userId, 'payment_attempt', 'success', {
+            order_id: order._id,
+            cart_value: totalAmount,
+            items_count: items.length,
+            payment_method: paymentMethod || 'cash_on_delivery'
+        });
+
         res.status(201).json({ success: true, message: 'Order placed successfully', order });
     } catch (error) {
         console.error('placeOrder error:', error.message);
+        await logEventToSentinelX(req, req.userId || 'anonymous', 'payment_attempt', 'failure', { reason: error.message || 'server_error' });
         res.status(500).json({ success: false, message: error.message });
     }
 };
